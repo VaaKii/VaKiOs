@@ -1,7 +1,7 @@
-#include <stdint.h>
-
 #ifndef _KERNEL_GPT_H
 #define _KERNEL_GPT_H
+
+#include <stdint.h>
 
 #define GDT_ACCESSED	0x01
 #define GDT_READWRITE	0x02

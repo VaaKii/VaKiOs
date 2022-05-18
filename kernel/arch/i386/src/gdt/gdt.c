@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
-extern void _set_gdtr();
-extern void _reload_segments();
+extern void _set_gdtr(void);
+extern void _reload_segments(void);
 
 static uint32_t gdt_pointer = 0;
 static uint32_t gdt_size = 0;
@@ -14,9 +14,9 @@ static uint32_t lowpart = 0;
 
 void gdt_init(){
     gdt_pointer = 0x806;
-    printf("GDT pointer: 0x%x\n", gdt_pointer);
+    printf("GDT location: 0x%x\n", gdt_pointer);
     gdtr_loc = 0x800;
-    printf("GDT location: 0x%x\n", gdtr_loc);
+    printf("GDTR location: 0x%x\n", gdtr_loc);
     gdt_add_descriptor(0, 0);
     gdt_add_descriptor(1, 0x00CF9A000000FFFF);
     gdt_add_descriptor(2, 0x00CF92000000FFFF);
@@ -33,15 +33,14 @@ int gdt_set_descriptor(){
     _set_gdtr();
     printf("GDTR was set. gdtr.size=%d gdtr.offset=0x%x\n", *(uint16_t*)(gdtr_loc-2) + 1, *(uint32_t*)gdtr_loc);
     _reload_segments();
-    printf("Segments were reloaded.\n");
     return 0;
 }
 
 int gdt_add_descriptor(uint8_t id, uint64_t desc){
     uint32_t loc = gdt_pointer + sizeof(uint64_t) * id;
     *(uint64_t*)loc = desc;
-    printf("Added entry %d = 0x%x << 32 | 0x%x\n", id, (*(uint64_t*)loc) >> 32,*(uint32_t*)loc+4);
-    gdt_size = sizeof(desc);
+    //printf("Added entry %d = 0x%x << 32 | 0x%x\n", id, (*(uint64_t*)loc) >> 32,*(uint32_t*)loc+4);
+    gdt_size += sizeof(desc);
     return 0;
 }
 
