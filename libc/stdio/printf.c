@@ -105,6 +105,7 @@ int printf(const char* restrict format, ...) {
             puts(str);
         }
         else if (*format == 'd') {
+            format++;
             int c = va_arg(parameters, int);
             char str[32] = {0};
             __itoa_s(c,10,str);
