@@ -2,7 +2,7 @@ DEFAULT_HOST!=../default-host.sh
 HOST?=DEFAULT_HOST
 HOSTARCH!=../target-triplet-to-arch.sh $(HOST)
 
-CFLAGS?=-O2 -g
+CFLAGS?=-Os -g -pedantic
 CPPFLAGS?=
 LDFLAGS?=
 LIBS?=
@@ -32,23 +32,15 @@ $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
 
 OBJS=\
-$(ARCHDIR)/bootloader/crti.o \
-$(ARCHDIR)/bootloader/crtbegin.o \
 $(KERNEL_OBJS) \
-$(ARCHDIR)/bootloader/crtend.o \
-$(ARCHDIR)/bootloader/crtn.o \
 
 LINK_LIST=\
 $(LDFLAGS) \
-$(ARCHDIR)/bootloader/crti.o \
-$(ARCHDIR)/bootloader/crtbegin.o \
 $(KERNEL_OBJS) \
 $(LIBS) \
-$(ARCHDIR)/bootloader/crtend.o \
-$(ARCHDIR)/bootloader/crtn.o \
 
 .PHONY: all clean install install-headers install-kernel
-.SUFFIXES: .o .c .S
+.SUFFIXES: .o .c .asm .S
 
 all: myos.kernel
 
@@ -62,8 +54,8 @@ $(ARCHDIR)/bootloader/crtbegin.o $(ARCHDIR)/bootloader/crtend.o:
 .c.o:
 	$(CC) -MD -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
 
-.S.o:
-	$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
+.asm.o:
+	nasm -felf32 $< -o $@ -Wall
 
 clean:
 	rm -f myos.kernel
