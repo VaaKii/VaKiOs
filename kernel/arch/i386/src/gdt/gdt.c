@@ -21,7 +21,8 @@ void gdt_init(){
     gdt_add_descriptor(1, 0x00CF9A000000FFFF);
     gdt_add_descriptor(2, 0x00CF92000000FFFF);
     gdt_add_descriptor(3, 0x008FFA000000FFFF); // 16bit code pl3
-    gdt_set_descriptor(4, 0x008FF2000000FFFF); // 16bit data pl3
+    gdt_add_descriptor(4, 0x008FF2000000FFFF); // 16bit data pl3
+    gdt_set_descriptor();
     printf("Global Descriptor Table is alive.\n");
 
 }
@@ -33,6 +34,7 @@ int gdt_set_descriptor(){
     _set_gdtr();
     printf("GDTR was set. gdtr.size=%d gdtr.offset=0x%x\n", *(uint16_t*)(gdtr_loc-2) + 1, *(uint32_t*)gdtr_loc);
     _reload_segments();
+    printf("Segments were reloaded.\n");
     return 0;
 }
 
