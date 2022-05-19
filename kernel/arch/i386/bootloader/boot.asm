@@ -24,13 +24,14 @@ global _set_gdtr:function
 _set_gdtr:
     push ebp
     mov ebp,esp
-    lgdt [800]
+    lgdt [0x800]
     mov esp,ebp
     pop ebp
     ret
 
 global _reload_segments:function
 _reload_segments:
+
     push ebp
     mov ebp,esp
     push eax
@@ -41,8 +42,8 @@ _reload_segments:
     mov gs, ax
     mov ss, ax
     pop eax
+    jmp 0x8:me
 
-    jmp 800:me
 me:
     mov esp, ebp
     pop ebp
@@ -59,8 +60,8 @@ _start:
 
 
 	cli
-.hang:
     hlt
+.hang:
 	jmp .hang
 .end:
 
