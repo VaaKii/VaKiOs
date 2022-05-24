@@ -20,6 +20,24 @@ stack_top:
 
 section .text
 
+global __idt_default_handler:function
+__idt_default_handler:
+    pusha
+    mov al, 0x20
+    mov dx, 0x20
+    out dx, al
+    popa
+    iret
+
+global _set_idtr:function
+_set_idtr:
+    push ebp
+    mov ebp, esp
+    lidt [0x10F0]
+    mov esp, ebp
+    pop ebp
+    ret
+
 global _set_gdtr:function
 _set_gdtr:
     push ebp
