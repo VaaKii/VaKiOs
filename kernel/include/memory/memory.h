@@ -18,6 +18,7 @@ extern void paging_map_virtual_to_phys(uint32_t virt, uint32_t phys);
 extern char* pmalloc(size_t size); /* page aligned alloc */
 extern char* malloc(size_t size);
 extern void free(void *mem);
+extern void pfree(void *mem);
 
 extern void* memcpy(void *dest, void const *src, size_t n);
 extern void* memset (void * ptr, int value, size_t num );

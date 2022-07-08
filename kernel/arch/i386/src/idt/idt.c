@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <idt/idt.h>
+#include <threading/tasking.h>
 #include <memory/hal.h>
 
 static uint32_t idt_location = 0;
@@ -28,6 +29,7 @@ void idt_init()
         idt_register_interrupt(i,(uint32_t)&__idt_default_handler);
     }
     idt_register_interrupt(0x2f,(uint32_t)&__idt_test_handler);
+    idt_register_interrupt(0x2e,(uint32_t)&schedule);
     printf("Registered all interrupts to default handler\n");
     *(uint16_t*)idtr_location = idt_size - 1;
     *(uint32_t*)(idtr_location + 2) = idt_location;
@@ -37,7 +39,7 @@ void idt_init()
     asm volatile("int $0x2f");
     while(test_timeout-- != 0)
     {
-        if(test_success != 1)
+        if(test_success != 0)
         {
             printf("Test success! Disabling INT#0x2F\n");
             idt_register_interrupt(0x2f,(uint32_t)&__idt_default_handler);

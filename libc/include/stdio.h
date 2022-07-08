@@ -9,6 +9,7 @@
 extern "C" {
 #endif
 
+#define pidprint(...) printf(__VA_ARGS__);
 #define panic(...) {printf("***KERNEL PANIC*** in %s at line %d in function: %s\n", __FILE__, __LINE__, __func__); printf(__VA_ARGS__); for(;;);}
 
 int printf(const char* __restrict, ...);

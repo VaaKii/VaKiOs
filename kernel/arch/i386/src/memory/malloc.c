@@ -25,6 +25,25 @@ void mm_init(uint32_t kernel_end){
     printf("Kernel heap start at: 0x%x\n", last_alloc);
 }
 
+void free(void *mem)
+{
+    alloc_t *alloc = (mem - sizeof(alloc_t));
+    memory_used -= alloc->size + sizeof(alloc_t);
+    alloc->status = 0;
+}
+
+void pfree(void *mem)
+{
+    if((uint32_t)mem < pheap_begin || (uint32_t)mem > pheap_end) return;
+    /* Determine which page is it */
+    uint32_t ad = (uint32_t)mem;
+    ad -= pheap_begin;
+    ad /= 4096;
+    /* Now, ad has the id of the page */
+    pheap_desc[ad] = 0;
+    return;
+}
+
 char* malloc(size_t size){
     if(!size) return 0;
 

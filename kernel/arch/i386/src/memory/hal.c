@@ -1,5 +1,7 @@
 #include <memory/hal.h>
+#include <idt/idt.h>
 #include <memory/pic.h>
+#include <threading/tasking.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -37,13 +39,13 @@ uint32_t inportl(uint16_t portid){
 }
 
 void outportb(uint16_t portid,uint8_t val){
-    asm volatile("outb %%al,%%dx"::"d"(portid),"a"(val));
+    asm volatile("outb %%al,%%dx": :"d"(portid),"a"(val));
 }
 
 void outportw(uint16_t portid,uint16_t val){
-    asm volatile("outw %%ax,%%dx"::"d"(portid),"a"(val));
+    asm volatile("outw %%ax,%%dx": :"d"(portid),"a"(val));
 }
 
 void outportl(uint16_t portid,uint32_t val){
-    asm volatile("outl %%eax,%%dx"::"d"(portid),"a"(val));
+    asm volatile("outl %%eax,%%dx": :"d"(portid),"a"(val));
 }
