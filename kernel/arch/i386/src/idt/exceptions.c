@@ -4,6 +4,7 @@
 #include <kernel/signal.h>
 #include <threading/pit.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 void exc_divide_by_zero()
 {
@@ -62,7 +63,7 @@ void exc_bound()
 
 void exc_invopcode()
 {
-    printf("Invalid opcode.\n");
+    panic("Invalid opcode.\n");
     if(is_tasking()) {
         send_sig(SIG_TERM);
         printf("Notifying process %s (%d) with SIGTERM\n", p_name(), p_pid());

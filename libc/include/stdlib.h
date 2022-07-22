@@ -9,6 +9,8 @@ extern "C" {
 
 __attribute__((__noreturn__))
 void abort(void);
+extern void error (int __status, int __errnum, const char *__format, ...)
+__attribute__ ((__format__ (__printf__, 3, 4)));
 
 #ifdef __cplusplus
 }

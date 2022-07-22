@@ -29,7 +29,7 @@ void idt_init()
         idt_register_interrupt(i,(uint32_t)&__idt_default_handler);
     }
     idt_register_interrupt(0x2f,(uint32_t)&__idt_test_handler);
-    idt_register_interrupt(0x2e,(uint32_t)&schedule);
+    //idt_register_interrupt(0x2e,(uint32_t)&schedule);
     printf("Registered all interrupts to default handler\n");
     *(uint16_t*)idtr_location = idt_size - 1;
     *(uint32_t*)(idtr_location + 2) = idt_location;
@@ -60,7 +60,7 @@ void __idt_test_handler()
 void idt_register_interrupt(uint8_t i, uint32_t callback)
 {
     if(!__idt_setup) panic("IDT not setup!");
-    *(uint16_t*)(idt_location + 8*i + 0) = (uint16_t)(callback & 0x0000FFFF);
+    *(uint16_t*)(idt_location + 8*i + 0) = (uint16_t)(callback & 0x0000ffff);
     *(uint16_t*)(idt_location + 8*i + 2) = (uint16_t)0x8;
     *(uint8_t*)(idt_location + 8*i + 4) = 0x00;
     *(uint8_t*) (idt_location + 8*i + 5) = 0x8e;

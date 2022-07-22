@@ -1,6 +1,6 @@
 
 #include <threading/pit.h>
-#include <memory/hal.h>
+#include <memory/pic.h>
 #include <stdio.h>
 #include <threading/tasking.h>
 #include <stdint.h>
@@ -23,11 +23,13 @@ void enable_task() {
 void pit_irq()
 {
     if(!task) {
-        asm volatile("add $0x1c, %esp");
-        asm volatile("pusha");
-        send_eoi(0);
-        asm volatile("popa");
-        asm volatile("iret");
+//        asm volatile("add $0x1c, %esp"); //0x1c
+//        asm volatile("pusha");
+//        asm volatile("push $0x0");
+//        asm volatile("call pic_send_eoi");
+        pic_send_eoi(0);
+//        asm volatile("popa");
+//        asm volatile("iret");
     } else {
         //asm volatile("add $0x1c, %esp");
         schedule();
@@ -43,7 +45,7 @@ static inline void __pit_send_data(uint16_t data, uint8_t counter)
 {
     uint8_t	port = (counter==PIT_OCW_COUNTER_0) ? PIT_REG_COUNTER0 :
                       ((counter==PIT_OCW_COUNTER_1) ? PIT_REG_COUNTER1 : PIT_REG_COUNTER2);
-    printf("Send pit data %d to %d",data,port);
+	
     outportb (port, (uint8_t)data);
 }
 
@@ -68,12 +70,9 @@ static void pit_start_counter (uint32_t freq, uint8_t counter, uint8_t mode) {
     ocw = (ocw & ~PIT_OCW_MASK_RL) | PIT_OCW_RL_DATA;
     ocw = (ocw & ~PIT_OCW_MASK_COUNTER) | counter;
     __pit_send_cmd (ocw);
-    printf("send 1\n");
     // set frequency rate
     __pit_send_data (divisor & 0xff, 0);
-    printf("send 2\n");
     __pit_send_data ((divisor >> 8) & 0xff, 0);
-    printf("send 3\n");
 }
 
 void pit_init()

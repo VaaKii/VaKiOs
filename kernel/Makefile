@@ -2,7 +2,7 @@ DEFAULT_HOST!=../default-host.sh
 HOST?=DEFAULT_HOST
 HOSTARCH!=../target-triplet-to-arch.sh $(HOST)
 
-CFLAGS?=-Os -g -pedantic
+CFLAGS?=-O0 -g -pedantic
 CPPFLAGS?=
 LDFLAGS?=
 LIBS?=
@@ -52,7 +52,7 @@ $(ARCHDIR)/bootloader/crtbegin.o $(ARCHDIR)/bootloader/crtend.o:
 	OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)` && cp "$$OBJ" $@
 
 .c.o:
-	$(CC) -MD -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
+	$(CC) -MD -c $< -o $@ -std=gnu99 $(CFLAGS) $(CPPFLAGS)
 
 .asm.o:
 	nasm -felf32 $< -o $@ -Wall

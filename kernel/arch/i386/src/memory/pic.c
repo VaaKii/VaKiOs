@@ -35,7 +35,6 @@ void pic_init()
 
 void pic_send_eoi(uint8_t irq)
 {
-    if(irq >= 8)
-        outportb(PIC_SLAVE_CMD, PIC_CMD_EOI);
+    if(irq >= 8) {outportb(PIC_SLAVE_CMD, PIC_CMD_EOI);}
     outportb(PIC_MASTER_CMD, PIC_CMD_EOI);
 }
