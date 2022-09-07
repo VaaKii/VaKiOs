@@ -9,16 +9,15 @@
 #include <stdint.h>
 
 #define INT_START asm volatile("pusha");
+
 #define INT_END asm volatile("popa"); \
-	asm volatile("iret");
-
-
+asm volatile("iret");
 
 #define IRQ_START asm volatile("add $0x1c, %esp"); \
-		asm volatile("pusha");
+    asm volatile("pusha");
 
 #define IRQ_END asm volatile("popa"); \
-	asm volatile("iret");
+    asm volatile("iret");
 
 
 #define DEFINE_IRQ(irqno, name, functionname, functocall) void functionname() { \

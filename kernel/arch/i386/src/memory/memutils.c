@@ -1,6 +1,8 @@
 #include <memory/memory.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <memory/mutex.h>
+
 
 void *memset16(void *ptr, uint16_t value, size_t num) {
     uint16_t *p = ptr;
@@ -18,11 +20,27 @@ void *memset(void *ptr, int value, size_t num) {
     return ptr;
 }
 
-void*memcpy(void*dst,const void*src,size_t n){
-    size_t i=0;
-    for(;i<(n&~7);i+=8)*(uint64_t*)((char*)dst+i)=*(const uint64_t*)((const char*)src+i);
-    if(i&4){           *(uint32_t*)((char*)dst+i)=*(const uint32_t*)((const char*)src+i);i+=4;}
-    if(i&2){           *(uint16_t*)((char*)dst+i)=*(const uint16_t*)((const char*)src+i);i+=2;}
-    if(i&1){           *(uint8_t *)((char*)dst+i)=*(const uint8_t *)((const char*)src+i);}
-    return dst;
+DEFINE_MUTEX(m_memcpy)
+void* memcpy(const void* dest, const void* src, size_t count )
+{
+	mutex_lock(&m_memcpy);
+	char* dst8 = (char*)dest;
+	char* src8 = (char*)src;
+
+	if (count & 1) {
+		dst8[0] = src8[0];
+		dst8 += 1;
+		src8 += 1;
+	}
+
+	count /= 2;
+	while (count--) {
+		dst8[0] = src8[0];
+		dst8[1] = src8[1];
+
+		dst8 += 2;
+		src8 += 2;
+	}
+	mutex_unlock(&m_memcpy);
+	return (void*)dest;
 }

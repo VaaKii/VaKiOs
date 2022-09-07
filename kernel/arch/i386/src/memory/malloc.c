@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <memory/memory.h>
+#include <threading/pit.h>
 
 #define MAX_PAGE_ALIGNED_ALLOCS 32
 
@@ -18,9 +19,7 @@ void mm_init(uint32_t kernel_end){
     pheap_end = 0x400000;
     pheap_begin = pheap_end - (MAX_PAGE_ALIGNED_ALLOCS * 4096);
     heap_end = pheap_begin;
-    printf("MM_INIT: Use memset. heap_begin: 0x%x\n", heap_begin);
     memset((char*)heap_begin, 0, heap_end - heap_begin);
-    printf("MM_INIT: Use memset done\n");
     pheap_desc = (uint8_t*)malloc(MAX_PAGE_ALIGNED_ALLOCS);
     printf("Kernel heap start at: 0x%x\n", last_alloc);
 }
@@ -34,7 +33,7 @@ void free(void *mem)
 
 void pfree(void *mem)
 {
-    if((uint32_t)mem < pheap_begin || (uint32_t)mem > pheap_end) return;
+    if(mem < (void *)pheap_begin || mem > (void *)pheap_end) return;
     /* Determine which page is it */
     uint32_t ad = (uint32_t)mem;
     ad -= pheap_begin;
@@ -65,7 +64,7 @@ char* malloc(size_t size){
         if(a->size >= size){
             a->status = 1;
 
-            printf("RE:Allocated %d bytes from 0x%x to 0x%x\n", size, mem + sizeof(alloc_t), mem + sizeof(alloc_t) + size);
+            //printf("RE:Allocated %d bytes from 0x%x to 0x%x\n", size, mem + sizeof(alloc_t), mem + sizeof(alloc_t) + size);
             memset(mem + sizeof(alloc_t), 0, size);
             memory_used += size + sizeof(alloc_t);
             return ((char*)mem + sizeof(alloc_t));
@@ -78,6 +77,7 @@ char* malloc(size_t size){
 
     nalloc:;
     if(last_alloc+size+sizeof(alloc_t) >= heap_end){
+        set_task(0);
         panic("Cannot allocate %d bytes! Out of memory.\n", size);
     }
     alloc_t *alloc = (alloc_t*)last_alloc;
@@ -87,7 +87,7 @@ char* malloc(size_t size){
     last_alloc += size;
     last_alloc += sizeof(alloc_t);
     last_alloc += 4;
-    printf("Allocated %d bytes from 0x%x to 0x%x\n", size, (uint32_t)alloc + sizeof(alloc_t), last_alloc);
+    //printf("Allocated %d bytes from 0x%x to 0x%x\n", size, (uint32_t)alloc + sizeof(alloc_t), last_alloc);
     memory_used += size + 4 + sizeof(alloc_t);
     memset((char*)(uint32_t)last_alloc + sizeof(alloc_t), 0, size);
     return ((char*)(uint32_t)last_alloc + sizeof(alloc_t));

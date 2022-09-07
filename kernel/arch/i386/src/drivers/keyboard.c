@@ -4,6 +4,7 @@
 #include <memory/memory.h>
 #include <threading/tasking.h>
 #include <idt/idt.h>
+#include <memory/mutex.h>
 #include <drivers/keyboard.h>
 
 void keyboard_irq();
@@ -92,7 +93,7 @@ void keyboard_init(){
     printf("PS/2 Keyboard init sequence activated.\n");
     keycache = (uint8_t*)malloc(256);
     memset(keycache,0,256);
-    set_int(0x33,(uint32_t)keyboard_irq);
+    set_int(33,(uint32_t)keyboard_irq);
     __kbd_enabled = 1;
     _kill();
 };
@@ -109,8 +110,10 @@ void keyboard_read_key(){
     }
 }
 
+DEFINE_MUTEX(m_getkey);
 static char c = 0;
 char keyboard_get_key(){
+    mutex_lock(&m_getkey);
     c = 0;
     if(key_loc == 0) goto out;
     c = *keycache;
@@ -119,6 +122,7 @@ char keyboard_get_key(){
         keycache[i] = keycache[i+1];
     }
     out:
+    mutex_unlock(&m_getkey);
     return c;
 }
 

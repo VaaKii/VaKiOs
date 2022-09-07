@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <memory/memory.h>
+#include <memory/mutex.h>
 
 #include <vga/tty.h>
 
@@ -43,14 +44,20 @@ void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
 	terminal_buffer[index] = vga_entry(c, color);
 }
 
+DEFINE_MUTEX(m_scroll)
 void scroll(){
+    mutex_lock(&m_scroll);
     void * start = (void*)VGA_MEMORY + 1 * VGA_WIDTH * 2;
     uint32_t size = terminal_row * VGA_WIDTH * 2;
-    if(terminal_row < 25) return;
+    if(terminal_row < 25){
+        mutex_unlock(&m_scroll);
+        return;
+    }
     memcpy(VGA_MEMORY,start,size);
     start = (void*)VGA_MEMORY + size;
-    memset16(start,vga_entry(0x20,terminal_color),VGA_WIDTH);
+    memset16(start,vga_entry(' ',terminal_color),VGA_WIDTH);
     terminal_row--;
+    mutex_unlock(&m_scroll);
 }
 
 void terminal_putchar(char c) {

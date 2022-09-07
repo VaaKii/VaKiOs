@@ -2,6 +2,7 @@
 #include <threading/pit.h>
 #include <memory/pic.h>
 #include <stdio.h>
+#include <memory/hal.h>
 #include <threading/tasking.h>
 #include <stdint.h>
 

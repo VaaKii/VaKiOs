@@ -63,7 +63,7 @@ void exc_bound()
 
 void exc_invopcode()
 {
-    panic("Invalid opcode.\n");
+    printf("Invalid opcode.\n");
     if(is_tasking()) {
         send_sig(SIG_TERM);
         printf("Notifying process %s (%d) with SIGTERM\n", p_name(), p_pid());
@@ -138,11 +138,16 @@ void exc_gpf()
 
 void exc_pf()
 {
-    panic("Page fault in %s (%d)\n",p_name(), p_pid());
+    uint32_t esp;
+    uint32_t cr2;
+    asm volatile("mov (%%esp), %%eax":"=a"(esp));
+    asm volatile("mov %%cr2, %%eax":"=a"(cr2));
+    printf("Page fault in %s (%d); (esp)=0x%x, cr2=0x%x\n",p_name(), p_pid(),esp,cr2);
     if(is_tasking()) {
         send_sig(SIG_TERM);
         panic("Notifying process %s (%d) with SIGTERM\n", p_name(), p_pid());
     }
+
     return;
 }
 

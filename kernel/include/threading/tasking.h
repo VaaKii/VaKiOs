@@ -7,33 +7,31 @@
 #define PROCESS_STATE_ZOMBIE 1
 #define PROCESS_STATE_DEAD 2
 
-static uint32_t MAX_OPEN_FILES = 16;
+typedef struct regs {
+  uint32_t eax, ebx, ecx, edx, esi, edi, esp, eip, eflags, cr3;
+} registers;
 
 struct _process;
 
 typedef struct _process {
-    struct _process* prev;
-    char* name;
-    uint32_t pid;
-    uint32_t esp;
-    uint32_t stacktop;
-    uint32_t eip;
-    uint32_t cr3;
-    uint32_t state;
-    uint16_t num_open_files;
-    char **open_files;
-    void (*notify)(int);
-    struct _process* next;
+  struct _process *prev;
+  char *name;
+  registers registers;
+  uint32_t pid;
+  uint32_t stacktop;
+  uint32_t state;
+  void (*notify)(int);
+  struct _process *next;
 } PROCESS;
 
-extern int addProcess(PROCESS* p);
-extern PROCESS* createProcess(char* name, uint32_t addr);
+extern int addProcess(PROCESS *p);
+extern PROCESS *createProcess(char *name, uint32_t addr);
 
 extern int is_pid_running(uint32_t pid);
 
 extern int is_tasking();
 
-extern char* p_name();
+extern char *p_name();
 extern int p_pid();
 extern PROCESS *p_proc();
 
