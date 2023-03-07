@@ -5,4 +5,7 @@
 * Panic
 * Memory management
 * GDT
-* Simple printf
+* IDT
+* Keyboard Driver
+* Tasking
+* Custom standart liblary
